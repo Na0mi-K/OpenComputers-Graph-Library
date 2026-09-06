@@ -320,11 +320,100 @@ Example:
 This means:
 - The x-axis displays values from 0 to 100.
 - The y-axis displays values from -50 to 50.
+ 
  The chart automatically converts data coordinates into normalized canvas coordinates.
+ 
  The vertical direction is inverted automatically so that larger mathematical y-values appear higher on the screen.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 12. Automatically Scaling a Chart
+You can calculate a range from arrays of data:
+```chart:autoscale(xs, ys)```
+Example:
+```
+local xs = {1, 2, 3, 4, 5}
+local ys = {10, 14, 12, 19, 25}
+chart:autoscale(xs, ys)
+```
+The function finds the minimum and maximum values and adds a small margin around them.
+The default margin is 5 percent:
+```chart:autoscale(xs, ys, 0.10)```
+The third argument sets the margin to 10 percent.
+If all x-values or all y-values are identical, the library expands that range automatically so the data remains visible.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+13. Plotting a Mathematical Function
+Use:
+```
+chart:plotFunction(
+    function,
+    xmin,
+    xmax,
+    samples,
+    color,
+    options
+)
+```
+Example:
+```
+chart:setRange(-math.pi, math.pi, -1.2, 1.2)
+
+chart:plotFunction(
+    math.sin,
+    -math.pi,
+    math.pi,
+    300,
+    0x00FF00
+)
+This plots 
+𝑦
+=
+sin
+⁡
+(
+𝑥
+)
+y=sin(x).
+```
+The function is sampled repeatedly between xmin and xmax. The resulting points are connected by line segments.
+# Options :
+You can display sample points:
+```
+chart:plotFunction(
+    function(x)
+        return x * x
+    end,
+    -2,
+    2,
+    200,
+    0xFF0000,
+    {
+        points = true,
+        pointRadius = 0.01
+    }
+)
+```
+Available options include:
+- Option	Description
+- points	Draws markers in addition to connecting lines
+- pointsOnly	Draws markers without connecting lines
+- pointRadius	Sets the normalized radius of each marker
+- The function is called with pcall, so errors do not crash the plotting operation. Invalid values and NaN values break the line, which is useful for discontinuous functions.
+For example:
+```
+chart:plotFunction(
+    function(x)
+        return 1 / x
+    end,
+    -5,
+    5,
+    300,
+    0xFFFF00
+)
+```
+The graph will not connect across the discontinuity at $ x=0 $
 
 
 
