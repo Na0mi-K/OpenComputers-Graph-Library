@@ -19,6 +19,29 @@ Then load it from another OpenComputers program:
 You must also obtain a GPU proxy. A typical OpenComputers setup looks like this:
 ```local component = require("component") local gpu = component.gpu```
 
+If you are using multiple screens, bind the GPU to the desired screen before creating a canvas:
+```gpu.bind(screenAddress)```
+The GPU passed to the library must already be bound to a screen.
+
+# 1. Creating a Canvas
+```local canvas = Graph.newCanvas(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 25,
+    background = 0x000000,
+    foreground = 0xFFFFFF
+})
+```
+
+```x```	Left screen coordinate in character cells	1
+```y```	Top screen coordinate in character cells	1
+```width```	Canvas width in character cells	Remaining screen width
+```height```	Canvas height in character cells	Remaining screen height
+```background```	Default background color	0x000000
+```foreground```	Default drawing color	0xFFFFFF
+```useBuffer```	Enables or disables GPU buffering	Automatic
+
 
 
 
