@@ -11,7 +11,7 @@ The library uses Unicode Braille characters to render graphics at a higher resol
 
 # Installation
 Save the library as: ```graph_lib.lua```
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Then load it from another OpenComputers program:
 ```local Graph = require("graph_lib")```
@@ -33,13 +33,20 @@ The GPU passed to the library must already be bound to a screen.
     foreground = 0xFFFFFF
 })
 ```
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ```x```	Left screen coordinate in character cells	1
+
 ```y```	Top screen coordinate in character cells	1
+
 ```width```	Canvas width in character cells	Remaining screen width
+
 ```height```	Canvas height in character cells	Remaining screen height
+
 ```background```	Default background color	0x000000
+
 ```foreground```	Default drawing color	0xFFFFFF
+
 ```useBuffer```	Enables or disables GPU buffering	Automatic
 
 
