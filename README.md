@@ -1,3 +1,4 @@
+<img width="1123" height="768" alt="Image" src="https://github.com/user-attachments/assets/e716535d-63ca-4ce8-8f5e-9ee2cbdb862b" />
 Graph Library for OpenComputers
 A lightweight Lua graphics and charting library designed for OpenComputers. It provides three main features:
 
@@ -417,9 +418,143 @@ The graph will not connect across the discontinuity at  $x = 0$
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 14. Plotting a Data Series
+Use:
+```chart:plotSeries(xs, ys, color, options)```
+Example:
+```
+local xs = {0, 1, 2, 3, 4}
+local ys = {2, 5, 3, 8, 6}
+
+chart:setRange(0, 4, 0, 10)
+chart:plotSeries(xs, ys, 0x00FFFF)
+```
+The values in ys are plotted against the corresponding values in xs.
+If xs is nil, the array index is used as the x-coordinate:
+```
+local values = {4, 8, 6, 10, 12}
+
+chart:setRange(1, 5, 0, 15)
+chart:plotSeries(nil, values, 0x00FF00)
+```
+This is equivalent to plotting:
+```(1, 4), (2, 8), (3, 6), (4, 10), (5, 12)```
+You can add point markers:
+```
+chart:plotSeries(
+    xs,
+    ys,
+    0xFF0000,
+    {
+        points = true,
+        pointRadius = 0.008
+    }
+)
+```
+To display only markers:
+```
+chart:plotSeries(
+    xs,
+    ys,
+    0xFF0000,
+    {
+        pointsOnly = true
+    }
+)
+```
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 15. Plotting Bar Charts
+```chart:plotBars(values, color, options)```
+Example:
+```
+local values = {10, 25, 15, 30, 20}
+chart:setRange(0, 5, 0, 35)
+chart:plotBars(values, 0x3366FF)
+```
+The bars are evenly spaced across the plot area.
+- The library determines:
+- The width of each bar.
+- The vertical position of zero.
+- The top and bottom of each bar.
+Whether a bar extends above or below zero.
+Negative values are supported:
+```
+local values = {-10, 15, -5, 20, 8}
+chart:setRange(0, 5, -15, 25)
+chart:plotBars(values, 0xFF8800)
+```
+Bars use whole-cell background fills rather than individual Braille dots. This makes them more visually solid and generally more efficient to render.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 16. Drawing Axes and Labels
+```chart:drawAxes()```
+- This draws:
+- The horizontal axis.
+- The vertical axis.
+- Y-axis labels.
+- X-axis labels.
+- The chart title, if one was configured.
+Example:
+```
+chart:drawAxes({
+    color = 0x888888,
+    yTicks = 5,
+    xTicks = 4,
+    titleColor = 0xFFFFFF
+})
+```
+Axis options :
+- Option	Description	Default
+- color	Axis line color	0x888888
+- yTicks	Number of intervals on the y-axis	5
+- xTicks	Number of intervals on the x-axis	3
+- titleColor	Title color	0xFFFFFF
+The axes are positioned at zero when zero lies within the current data range. Otherwise, they are placed at the relevant plot boundary.
+For example, if the y-range is:
+```-10 to 10```
+the x-axis appears in the middle of the graph. If the y-range is:
+```10 to 100```
+zero is outside the range, so the x-axis is drawn at the lower edge.
+After drawing all chart content, render it:
+```chart:render()```
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 17. RollingSeries
+RollingSeries is a fixed-size circular buffer intended for live graphs.
+Create one with:
+```local history = Graph.newRollingSeries(60)```
+This buffer stores at most 60 values. Adding values :
+```
+history:push(1250)
+history:push(1275)
+history:push(1300)
+```
+When the buffer is full, adding a new value overwrites the oldest one. Retrieving values :
+```local values = history:values()```
+The returned table is ordered from oldest to newest, making it directly compatible with plotSeries():
+```chart:plotSeries(nil, history:values(), 0x00FF00)```
+This makes it suitable for:
+- Energy history.
+- Power output.
+- Temperature monitoring.
+- Machine throughput.
+- Computer performance graphs.
+- Live OpenComputers dashboards.
 
 
 
 
 
-<img width="1123" height="768" alt="Image" src="https://github.com/user-attachments/assets/e716535d-63ca-4ce8-8f5e-9ee2cbdb862b" />
+
+
+
+
+
+
+
+
+
