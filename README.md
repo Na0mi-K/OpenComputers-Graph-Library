@@ -10,7 +10,16 @@ A rolling data buffer for live-updating graphs and dashboards.
 The library uses Unicode Braille characters to render graphics at a higher resolution than ordinary terminal characters. It is designed to work with Lua 5.1, 5.2, and 5.3, including the Lua environments commonly used by OpenComputers.
 
 # Installation
-Save the library as: graph_lib.lua
+Save the library as: ```graph_lib.lua```
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Then load it from another OpenComputers program:
+```local Graph = require("graph_lib")```
+
+You must also obtain a GPU proxy. A typical OpenComputers setup looks like this:
+```local component = require("component") local gpu = component.gpu```
+
+
 
 
 
