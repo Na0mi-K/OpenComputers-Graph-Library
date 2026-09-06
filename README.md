@@ -194,6 +194,123 @@ This method is especially useful for:
 - Large backgrounds.
 - Unlike Braille drawing, cell filling changes the background color of each terminal cell.
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 7. Drawing Text
+Text is drawn using character-cell coordinates, not Braille-dot coordinates.
+```canvas:text(x, y, text, foreground, background)```
+Coordinates are zero-based relative to the canvas.
+Example:
+```
+canvas:text(
+    2,
+    1,
+    "Power Dashboard",
+    0xFFFFFF,
+    0x202020
+)
+```
+The foreground and background colors are optional:
+```canvas:text(2, 2, "Temperature")```
+If no foreground color is supplied, the canvas default foreground color is used. If no background color is supplied, the canvas background color is used.
+The function can also write a string longer than one character cell:
+```canvas:text(5, 5, "Energy: 1250 RF/t", 0x00FF00)```
+The library treats this as a text run and sends it to the GPU in one operation where possible.
+Text has priority over other canvas layers. If the same cell contains text, the text is rendered instead of a block or Braille character.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 8. Clearing the Canvas
+# To clear all drawings:
+```canvas:clear()```
+You can also change the background color while clearing:
+```canvas:clear(0x000000)```
+This removes:
+- Braille dots.
+- Block fills.
+- Text.
+- The touched-cell tracking information.
+After clearing, call:
+```canvas:render()```
+to update the physical screen.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 9. Rendering
+Drawing operations modify the canvas’s internal data structures. They do not immediately draw everything to the screen.
+To display the current canvas:
+```canvas:render()```
+This design allows several objects to be drawn before the GPU is updated.
+
+Partial rendering
+The canvas tracks which character cells have changed. During rendering, it updates only those cells instead of redrawing the entire canvas.
+
+This is useful for performance, particularly when:
+- Only a small line graph changes.
+- A dashboard updates one value.
+- A live chart receives a new data point.
+- Most of the screen remains static.
+
+Consecutive cells with matching colors are grouped into GPU calls when possible.
+
+# GPU buffering
+If supported by the GPU, the library attempts to allocate a VRAM buffer automatically. Buffering helps reduce flickering when rendering large or frequently updated displays.
+
+You can explicitly disable buffering:
+```
+local canvas = Graph.newCanvas(gpu, {
+    width = 80,
+    height = 25,
+    useBuffer = false
+})
+```
+The buffer is released when the canvas is destroyed:
+```canvas:destroy()```
+You should call destroy() when the canvas will no longer be used.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 10. Creating a Chart
+A chart is a specialized canvas with:
+- A data coordinate system.
+- Plotting functions.
+- Data-series plotting.
+- Bar charts.
+- Axes and labels.
+- Optional titles.
+- Create one with:
+```
+local chart = Graph.newChart(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 25,
+    title = "Power Output"
+})
+```
+By default, the chart reserves margins for labels:
+```
+left   = 6
+bottom = 2
+top    = 1
+right  = 1
+```
+You can customize the margins:
+```
+local chart = Graph.newChart(gpu, {
+    width = 80,
+    height = 25,
+    margin = {
+        left = 8,
+        bottom = 3,
+        top = 2,
+        right = 2
+    }
+})
+```
+The actual graph is drawn inside the plot area, while the margins are used for labels and titles.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
