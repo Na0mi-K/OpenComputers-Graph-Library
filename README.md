@@ -178,7 +178,21 @@ The circle implementation uses the midpoint circle algorithm.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 6. Filling Character Cells
+Braille dots are useful for detailed lines, but they are not ideal for large solid areas. The library therefore supports whole-cell block fills.
 
+lua
+canvas:fillCellsRaw(x, y, width, height, color)
+Example:
+```canvas:fillCellsRaw(5, 5, 10, 8, 0x3366FF)```
+This fills a rectangular area using the background color of each character cell.
+This method is especially useful for:
+- Bar charts.
+- Progress bars.
+- Solid panels.
+- Colored dashboard areas.
+- Large backgrounds.
+- Unlike Braille drawing, cell filling changes the background color of each terminal cell.
 
 
 
