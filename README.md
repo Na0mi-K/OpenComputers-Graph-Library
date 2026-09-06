@@ -50,6 +50,21 @@ The GPU passed to the library must already be bound to a screen.
 ```useBuffer```	Enables or disables GPU buffering	Automatic
 
 
+# For Example : 
+
+```
+local canvas = Graph.newCanvas(gpu, {
+    x = 2,
+    y = 2,
+    width = 60,
+    height = 20,
+    background = 0x101010,
+    foreground = 0xFFFFFF,
+    useBuffer = true
+})
+```
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 
