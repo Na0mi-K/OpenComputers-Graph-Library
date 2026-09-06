@@ -67,6 +67,18 @@ local canvas = Graph.newCanvas(gpu, {
 
 The canvas internally represents each terminal character cell as a grid of 2 × 4 Braille dots. Therefore, a canvas of 60 × 20 character cells has an effective drawing resolution of: ```120 × 80 dots```
 
+2. Coordinate Systems
+The canvas supports two coordinate systems.
+
+Normalized coordinates
+Normalized coordinates range from 0 to 1:
+
+```
+(0, 0) = top-left of the canvas
+(1, 1) = bottom-right of the canvas
+```
+This is the recommended coordinate system for general-purpose drawings because it automatically scales to different screen sizes.
+
 
 
 
