@@ -1,4 +1,3 @@
-<img width="1123" height="768" alt="Image" src="https://github.com/user-attachments/assets/e716535d-63ca-4ce8-8f5e-9ee2cbdb862b" />
 Graph Library for OpenComputers
 A lightweight Lua graphics and charting library designed for OpenComputers. It provides three main features:
 
@@ -10,7 +9,12 @@ A rolling data buffer for live-updating graphs and dashboards.
 
 The library uses Unicode Braille characters to render graphics at a higher resolution than ordinary terminal characters. It is designed to work with Lua 5.1, 5.2, and 5.3, including the Lua environments commonly used by OpenComputers.
 
-# Installation
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Preview :
+
+<img width="1123" height="768" alt="Image" src="https://github.com/user-attachments/assets/e716535d-63ca-4ce8-8f5e-9ee2cbdb862b" />
+
+# Installation :
 Save the library as: ```graph_lib.lua```
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -545,16 +549,321 @@ This makes it suitable for:
 - Computer performance graphs.
 - Live OpenComputers dashboards.
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 18. Live Graph Example
+The following example creates a live-updating graph:
+```
+local component = require("component")
+local event = require("event")
+local math = math
+local Graph = require("graph_lib")
 
+local gpu = component.gpu
 
+local chart = Graph.newChart(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 25,
+    background = 0x000000,
+    foreground = 0xFFFFFF,
+    title = "Live Power Output"
+})
 
+local history = Graph.newRollingSeries(60)
 
+while true do
+    local value = 50 + 30 * math.sin(os.clock()) + math.random() * 5
+    history:push(value)
 
+    chart:clear(0x000000)
+    chart:setRange(1, 60, 0, 100)
+    chart:plotSeries(nil, history:values(), 0x00FF00, {
+        points = true,
+        pointRadius = 0.006
+    })
+    chart:drawAxes({
+        color = 0x555555,
+        yTicks = 5,
+        xTicks = 3
+    })
+    chart:render()
 
+    local _, _, reason = event.pull(1, "interrupted")
+    if reason == "interrupted" then
+        break
+    end
+end
 
+chart.canvas:destroy()
+```
+The important detail is the use of: ```event.pull(1, "interrupted")```
+instead of ```os.sleep().```
+This allows the program to wait while continuing to respond to interruption events and other OpenComputers event handling.
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 19. Combining Multiple Graphs
+You can create several canvases or charts on the same screen.
+```
+local topChart = Graph.newChart(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 12,
+    title = "Power"
+})
+local bottomChart = Graph.newChart(gpu, {
+    x = 1,
+    y = 14,
+    width = 80,
+    height = 12,
+    title = "Temperature"
+})
+```
+Each chart has its own region and can be rendered independently.
+You can also use a regular canvas for dashboard labels:
+```
+local dashboard = Graph.newCanvas(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 25
+})
 
+dashboard:text(2, 2, "System Status", 0xFFFFFF)
+dashboard:text(2, 3, "Online", 0x00FF00)
+dashboard:render()
+```
+When several objects overlap, the object rendered last will generally overwrite the same screen cells.
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 20. Rendering Priority
+When multiple drawing layers occupy the same cell, the library uses this priority:
+- Text
+- Whole-cell block fill.
+- Braille dots.
+- Empty background.
+In other words, text is rendered over a block, and a block is rendered over Braille dots.
+This is important when combining charts with labels. A label may cover part of a graph if both use the same cells.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 21. Color Format
+Colors are specified as hexadecimal RGB values: ```0xRRGGBB```
+Examples:
+```
+0xFF0000 -- red
+0x00FF00 -- green
+0x0000FF -- blue
+0xFFFFFF -- white
+0x000000 -- black
+0xFFFF00 -- yellow
+0x00FFFF -- cyan
+0xFF00FF -- magenta
+```
+The library normalizes color values into the range from ```0x000000``` to ```0xFFFFFF```
+It intentionally avoids Lua 5.3-only bitwise operators such as:
+- &
+- |
+- ~
+- <<
+- >>
+It also avoids integer floor division: ```//```
+This keeps the source compatible with older Lua runtimes used by OpenComputers.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 22. Important Implementation Details
+# Sparse storage
+The canvas stores only cells that contain content or have been modified.
+It maintains separate layers for:
+```
+cellDots
+cellColor
+cellBlock
+cellText
+touched
+```
+This avoids allocating a complete large screen-sized structure when only a small part of the canvas is being used.
+# Braille rendering
+Each Braille character represents eight possible dots. The dot layout is:
+```
+(0,0) (1,0)   weights 0x01, 0x08
+(0,1) (1,1)   weights 0x02, 0x10
+(0,2) (1,2)   weights 0x04, 0x20
+(0,3) (1,3)   weights 0x40, 0x80
+```
+The final Unicode code point is:```0x2800 + sum of active dot weights```
+The library stores each dot as a Boolean instead of using bitwise operators. This is deliberate because some OpenComputers Lua environments use Lua 5.2, where Lua 5.3 bitwise syntax is unavailable.
+# Dirty-cell rendering
+When a drawing operation modifies a cell, that cell is added to the touched set.
+During rendering, only touched cells are considered. This significantly reduces GPU activity when updating small portions of a display.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 23. Complete Basic Example
+```
+local component = require("component")
+local Graph = require("graph_lib")
+
+local gpu = component.gpu
+
+local canvas = Graph.newCanvas(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 25,
+    background = 0x101010,
+    foreground = 0xFFFFFF
+})
+
+canvas:clear(0x101010)
+
+canvas:text(2, 1, "Graph Library Demo", 0xFFFFFF)
+
+canvas:line(0.05, 0.15, 0.95, 0.15, 0xFF0000)
+
+canvas:rect(
+    0.10, 0.25,
+    0.30, 0.30,
+    0x00FF00,
+    false
+)
+
+canvas:rect(
+    0.55, 0.25,
+    0.30, 0.30,
+    0x0000FF,
+    true
+)
+
+canvas:circle(
+    0.50, 0.75,
+    0.15,
+    0xFFFF00,
+    false
+)
+
+canvas:render()
+```
+This example displays:
+- A title.
+- A red line.
+- A green rectangle outline.
+- A filled blue rectangle.
+- A yellow circle.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 24. Complete Chart Example
+```
+local component = require("component")
+local Graph = require("graph_lib")
+local gpu = component.gpu
+local chart = Graph.newChart(gpu, {
+    x = 1,
+    y = 1,
+    width = 80,
+    height = 25,
+    background = 0x000000,
+    foreground = 0xFFFFFF,
+    title = "Sine Function"
+})
+
+chart:clear(0x000000)
+
+chart:setRange(
+    -math.pi,
+    math.pi,
+    -1.2,
+    1.2
+)
+
+chart:plotFunction(
+    math.sin,
+    -math.pi,
+    math.pi,
+    300,
+    0x00FF00,
+    {
+        points = false
+    }
+)
+
+chart:drawAxes({
+    color = 0x666666,
+    yTicks = 4,
+    xTicks = 4
+})
+
+chart:render()
+```
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 25. API Reference
+# Main constructors
+```
+Graph.newCanvas(gpu, opts)
+Graph.newChart(gpu, opts)
+Graph.newRollingSeries(maxPoints)
+```
+# Canvas methods
+```
+canvas:clear(background)
+canvas:setDot(x, y, color)
+canvas:clearDot(x, y)
+canvas:lineRaw(x0, y0, x1, y1, color)
+canvas:rectRaw(x, y, width, height, color, filled)
+canvas:circleRaw(cx, cy, radius, color, filled)
+canvas:line(x0, y0, x1, y1, color)
+canvas:rect(x, y, width, height, color, filled)
+canvas:circle(cx, cy, radius, color, filled)
+canvas:fillCellsRaw(x, y, width, height, color)
+canvas:text(x, y, text, foreground, background)
+canvas:render()
+canvas:destroy()
+```
+# Chart methods
+```
+chart:setRange(xmin, xmax, ymin, ymax)
+chart:autoscale(xs, ys, marginPercent)
+chart:clear(background)
+chart:plotFunction(f, xmin, xmax, samples, color, opts)
+chart:plotSeries(xs, ys, color, opts)
+chart:plotBars(values, color, opts)
+chart:drawAxes(opts)
+chart:render()
+RollingSeries methods
+lua
+series:push(value)
+series:values()
+```
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# 26. Limitations and Considerations
+- The canvas dimensions are measured in terminal character cells, not pixels.
+- Braille rendering requires a screen/font that supports Unicode Braille characters.
+- Text coordinates are character-based, while drawing coordinates are normalized or raw dot-based.
+- A text string can occupy multiple cells, so long text may overwrite neighboring content.
+- plotBars() uses whole-cell fills, so its resolution is lower than a Braille-based graph.
+- Charts should be cleared and redrawn before each live update unless you intentionally want to preserve old content.
+- The chart’s y-axis label positioning assumes the default chart layout and may require adjustment for unusual margins.
+- GPU buffering depends on hardware and OpenComputers version support.
+- The graph library performs no automatic legend management or multiple-series styling; those must be implemented by the caller.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Summary
+- This library provides a compact graphics layer for OpenComputers:
+- Use Graph.newCanvas() for general drawings, diagrams, UI elements, and shapes.
+- Use normalized coordinates when you want layouts to scale between screen sizes.
+- Use raw coordinates when you need precise Braille-dot control.
+- Use Graph.newChart() for mathematical functions and data visualization.
+- Use Graph.newRollingSeries() for live-updating graphs and dashboards.
+- Call render() after drawing.
+ -Call destroy() when a canvas is no longer needed.
