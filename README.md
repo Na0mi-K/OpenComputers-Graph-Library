@@ -20,7 +20,8 @@ You must also obtain a GPU proxy. A typical OpenComputers setup looks like this:
 If you are using multiple screens, bind the GPU to the desired screen before creating a canvas:
 ```gpu.bind(screenAddress)```
 The GPU passed to the library must already be bound to a screen.
-
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Tutorial :
 # 1. Creating a Canvas
 ```local canvas = Graph.newCanvas(gpu, {
     x = 1,
