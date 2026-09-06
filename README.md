@@ -312,7 +312,18 @@ The actual graph is drawn inside the plot area, while the margins are used for l
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 11. Setting the Chart Range
+A chart needs to know which data values correspond to the visible plot area.
+```chart:setRange(xmin, xmax, ymin, ymax)```
+Example:
+```chart:setRange(0, 100, -50, 50)```
+This means:
+- The x-axis displays values from 0 to 100.
+- The y-axis displays values from -50 to 50.
+ The chart automatically converts data coordinates into normalized canvas coordinates.
+ The vertical direction is inverted automatically so that larger mathematical y-values appear higher on the screen.
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
