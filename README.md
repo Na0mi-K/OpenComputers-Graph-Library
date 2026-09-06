@@ -344,7 +344,7 @@ If all x-values or all y-values are identical, the library expands that range au
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-13. Plotting a Mathematical Function
+# 13. Plotting a Mathematical Function
 Use:
 ```
 chart:plotFunction(
@@ -413,8 +413,9 @@ chart:plotFunction(
     0xFFFF00
 )
 ```
-The graph will not connect across the discontinuity at $ x=0 $
+The graph will not connect across the discontinuity at  $x = 0$
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
