@@ -1,4 +1,5 @@
-Graph Library for OpenComputers
+# Graph Library for OpenComputers : a Program by NaomiK , FluoroPolymers™
+
 A lightweight Lua graphics and charting library designed for OpenComputers. It provides three main features:
 - A canvas for drawing shapes and text.
 - A chart system for plotting functions, data series, and bar charts.
