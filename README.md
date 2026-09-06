@@ -78,10 +78,37 @@ Normalized coordinates range from 0 to 1:
 (1, 1) = bottom-right of the canvas
 ```
 This is the recommended coordinate system for general-purpose drawings because it automatically scales to different screen sizes.
+ie: ```canvas:line(0, 0, 1, 1, 0xFF0000)```
 
+# Raw dot coordinates
+Raw coordinates address the individual Braille dots directly.
+For a canvas of width W and height H in character cells:
+```
+raw width  = W × 2
+raw height = H × 4
+```
+------
+```canvas:lineRaw(0, 0, canvas.dotsW - 1, canvas.dotsH - 1, 0x00FF00)```
 
+# 3. Drawing Lines
+Normalized line
 
+```canvas:line(x0, y0, x1, y1, color)```
+Example:
+```
+canvas:line(
+    0.1, 0.1,
+    0.9, 0.9,
+    0xFF0000
+)
+```
+This draws a red line between two normalized positions.
+Raw line :
 
+```canvas:lineRaw(x0, y0, x1, y1, color)```
+Example:
+```canvas:lineRaw(0, 0, 50, 20, 0x00FF00)```
+The implementation uses Bresenham’s line algorithm, which produces efficient integer-coordinate lines without requiring floating-point calculations for every pixel.
 
 
 
