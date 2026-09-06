@@ -3,6 +3,7 @@ A lightweight Lua graphics and charting library designed for OpenComputers. It p
 - A canvas for drawing shapes and text.
 - A chart system for plotting functions, data series, and bar charts.
 - A rolling data buffer for live-updating graphs and dashboards.
+
 The library uses Unicode Braille characters to render graphics at a higher resolution than ordinary terminal characters. It is designed to work with Lua 5.1, 5.2, and 5.3, including the Lua environments commonly used by OpenComputers.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ### Preview :
